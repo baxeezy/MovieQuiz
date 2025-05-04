@@ -29,10 +29,29 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self?.show(quiz: viewModel)}
     }
 
+    // MARK: - iii
+    private func show(quiz result: QuizResultsViewModel) {
+        let alertPresenter = AlertPresenter(presentingController: self)
+        
+        let alertModel = AlertModel(
+            title: result.title,
+            message: result.text,
+            buttonText: result.buttonText,
+            completion: { [weak self] in
+                guard let self = self else { return }
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                self.questionFactory?.requestNextQuestion()
+                self.setAnswerButtonsState(isEnabled: true)
+            }
+        )
+        alertPresenter.showAlert(model: alertModel)
+    }
+    
     // MARK: - Properties
     
     private var currentQuestionIndex = 0    // Индекс текущего вопроса
-    private var correctAnswer = 0           // Счетчик правильных ответов
+    private var correctAnswers = 0           // Счетчик правильных ответов
   
     private let questionsAmount: Int = 10    // Общее количество вопросов для квиза
     private var questionFactory: QuestionFactoryProtocol? = QuestionFactory()     // Фабрика вопросов
@@ -71,32 +90,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // Показывает алерт с результатами
-    private func show(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(
-            title: result.title,
-            message: result.text,
-            preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            // Сбрасываем игру при нажатии на кнопку
-            self.currentQuestionIndex = 0
-            self.correctAnswer = 0
-            questionFactory?.requestNextQuestion()
-            }
-            
-            // Показываем алерт
-            alert.addAction(action)
-            self.present(alert, animated: true, completion: nil)
-            setAnswerButtonsState(isEnabled: true)
-        }
+
 
     
     // Показывает результат ответа
     private func showAnswerResult(isCorrect: Bool) {
         setAnswerButtonsState(isEnabled: false) // Блокируем кнопки от спама
         if isCorrect {
-                correctAnswer += 1  // Увеличиваем счетчик правильных ответов
+                correctAnswers += 1  // Увеличиваем счетчик правильных ответов
             }
         // Меняем цвет рамки в зависимости от ответа
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -111,9 +112,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // Определяет, показывать следующий вопрос или результаты
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {    // Если вопросы закончились - показываем результаты
-            let text = correctAnswer == questionsAmount ?
+            let text = correctAnswers == questionsAmount ?
                         "Поздравляем, вы ответили на 10 из 10!" :
-                        "Вы ответили на \(correctAnswer) из 10, попробуйте ещё раз!"
+                        "Вы ответили на \(correctAnswers) из 10, попробуйте ещё раз!"
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
                 text: text,
