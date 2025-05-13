@@ -3,64 +3,50 @@ import UIKit
 final class StatisticService: StatisticServiceProtocol {
     
     private enum Keys: String {
-        case correct
-        case bestGame
+        case correct, total, date
         case gamesCount
+        case totalAccuracySum
     }
     
     private let storage: UserDefaults = .standard
 
-    // Общая точность ответов за все время
     var totalAccuracy: Double {
-        let totalCorrectAnswers = Double(storage.integer(forKey: "totalCorrectAnswers"))
-        guard gamesCount > 0 else { return 0.0 }
-        let total = ((totalCorrectAnswers) / (Double(gamesCount)*10))*100
-        return total
+        guard gamesCount > 0 else { return 0 }
+                return storage.double(forKey: Keys.totalAccuracySum.rawValue) / Double(gamesCount)
     }
     
-    // Количество игр за все время
     var gamesCount: Int {
         get {
-            return storage.integer(forKey: Keys.gamesCount.rawValue)
+            storage.integer(forKey: Keys.gamesCount.rawValue)
         }
         set {
             storage.set(newValue, forKey: Keys.gamesCount.rawValue)
         }
     }
     
-    // Лучший результат
     var bestGame: GameResult {
         get {
-            let correct = storage.integer(forKey: "bestGameCorrect")    // Результат правильных ответов у лучшего результата
-            let total = storage.integer(forKey: "bestGameTotal")    // Количество вопросов квиза у лучшего результата
-            let date = storage.object(forKey: "bestGameDate") as? Date ?? Date()    // Дата завершения квиза у лучшего результата
-            return GameResult(correct: correct, total: total, date: date)
+            GameResult(
+                correct: storage.integer(forKey: Keys.correct.rawValue),
+                total: storage.integer(forKey: Keys.total.rawValue),
+                date: storage.object(forKey: Keys.date.rawValue) as? Date ?? Date()
+            )
         }
         set {
-            storage.set(newValue.correct, forKey: "bestGameCorrect")
-            storage.set(newValue.total, forKey: "bestGameTotal")
-            storage.set(newValue.date, forKey: "bestGameDate")
+            storage.set(newValue.correct, forKey: Keys.correct.rawValue)
+            storage.set(newValue.total, forKey: Keys.total.rawValue)
+            storage.set(newValue.date, forKey: Keys.date.rawValue)
         }
     }
     
-    // Реализовать функцию сохранения лучшего результата store — с проверкой на то, что новый результат лучше сохранённого в UserDefaults;
-    // Этот метод принимает результат игры: количество правильных ответов и общее число заданных вопросов по окончании.
     func store(correct count: Int, total amount: Int) {
-        // 1. Создаем новый результат игры
+        let gameAccuracy = (Double(count) / Double(amount)) * 100
+        let currentSum = storage.double(forKey: Keys.totalAccuracySum.rawValue)
+        storage.set(currentSum + gameAccuracy, forKey: Keys.totalAccuracySum.rawValue)
+        gamesCount += 1
         let newResult = GameResult(correct: count, total: amount, date: Date())
-        
-        // 2. Получаем текущий лучший результат из UserDefaults
-        let savedCorrect = storage.integer(forKey: "bestGameCorrect")
-        let savedTotal = storage.integer(forKey: "bestGameTotal")
-        let savedDate = storage.object(forKey: "bestGameDate") as? Date ?? Date()
-        let savedResult = GameResult(correct: savedCorrect, total: savedTotal, date: savedDate)
-        
-        // 3. Сравниваем результаты
-        if newResult.isBetterThan(savedResult) {
-            // 4. Сохраняем новый лучший результат
-            storage.set(newResult.correct, forKey: "bestGameCorrect")
-            storage.set(newResult.total, forKey: "bestGameTotal")
-            storage.set(newResult.date, forKey: "bestGameDate")
+        if newResult.isBetterThan(bestGame) {
+            bestGame = newResult
         }
     }
 }

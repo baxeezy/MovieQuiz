@@ -1,8 +1,7 @@
 import UIKit
 
-// Модель для вопроса квиза
 struct QuizQuestion {
-    let image: String           // Название изображения
-    let text: String            // Текст вопроса
-    let correctAnswer: Bool     // Правильный ответ
+    let image: String
+    let text: String
+    let correctAnswer: Bool
 }
