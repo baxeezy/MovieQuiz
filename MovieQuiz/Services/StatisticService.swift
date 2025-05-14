@@ -2,6 +2,8 @@ import UIKit
 
 final class StatisticService: StatisticServiceProtocol {
     
+    private let statisticService: StatisticServiceProtocol = StatisticService()
+    
     private enum Keys: String {
         case correct, total, date
         case gamesCount
