@@ -6,14 +6,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)
-        self.questionFactory = questionFactory
+        let factory = QuestionFactory()
+        factory.setup(delegate: self)
+        self.questionFactory = factory
         questionFactory.requestNextQuestion()
         setUpImage()
-        print(Bundle.main.bundlePath)
-        print(NSHomeDirectory())
-        UserDefaults.standard.set(true, forKey: "viewDidLoad")
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -34,10 +31,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     private let questionsAmount: Int = 10
-    private var questionFactory: QuestionFactoryProtocol? = QuestionFactory()
+    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
     private var currentQuestion: QuizQuestion?
-    private let statisticService = StatisticService()
-    
+    private let statisticService: StatisticServiceProtocol = StatisticService()
+
     //MARK: - IBOutlets
     
     @IBOutlet private var imageView: UIImageView!
@@ -87,7 +84,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             show(quiz: viewModel)
         } else {
             currentQuestionIndex += 1
-            questionFactory?.requestNextQuestion()
+            questionFactory.requestNextQuestion()
         }
     }
     
@@ -113,7 +110,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 guard let self = self else { return }
                 self.currentQuestionIndex = 0
                 self.correctAnswers = 0
-                self.questionFactory?.requestNextQuestion()
+                self.questionFactory.requestNextQuestion()
                 self.setAnswerButtonsState(isEnabled: true)
             }
         )
