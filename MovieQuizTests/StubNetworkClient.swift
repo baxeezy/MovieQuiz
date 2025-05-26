@@ -1,4 +1,5 @@
 import UIKit
+@testable import MovieQuiz
 
 struct StubNetworkClient: NetworkRouting {
     enum TestError: Error {    // тестовая ошибка
