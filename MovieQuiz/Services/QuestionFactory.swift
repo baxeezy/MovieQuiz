@@ -52,10 +52,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
             }
         }
     }
-        
-    func setup(delegate: QuestionFactoryDelegate) {
-            self.delegate = delegate
-        }
 }
 
 //    private let questions: [QuizQuestion] = [
