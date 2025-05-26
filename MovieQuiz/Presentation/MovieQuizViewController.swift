@@ -151,7 +151,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didFailToLoadData(with error: any Error) {
-        print(error)
+        showNetworkError(message: error.localizedDescription)
     }
     
     // MARK: - IBActions
