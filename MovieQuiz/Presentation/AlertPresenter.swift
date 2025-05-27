@@ -19,6 +19,7 @@ final class AlertPresenter {
         ) { _ in
             model.completion()
         }
+        alert.view.accessibilityIdentifier = "Game results"
         alert.addAction(action)
         presentingController?.present(alert, animated: true)
     }
