@@ -1,19 +1,6 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController {
-    // MARK: - Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setUpImage()
-        presenter = MovieQuizPresenter(viewController: self)
-        presenter.viewController = self
-    }
-    
-    // MARK: - Properties
-    private var presenter: MovieQuizPresenter!
-    private var statisticService: StatisticServiceProtocol = StatisticService()
-
     //MARK: - IBOutlets
     
     @IBOutlet private var imageView: UIImageView!
@@ -23,7 +10,29 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet weak var yesButton: UIButton!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
-    //MARK: - Private Methods
+    private var presenter: MovieQuizPresenter!
+    
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        presenter = MovieQuizPresenter(viewController: self)
+        setUpImage()
+
+    }
+    
+    // MARK: - Actions
+    
+    @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        presenter.yesButtonClicked()
+    }
+    
+    @IBAction private func noButtonClicked(_ sender: UIButton) {
+        presenter.noButtonClicked()
+    }
+    
+    //MARK: - Functions
     
     func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
@@ -33,58 +42,31 @@ final class MovieQuizViewController: UIViewController {
         setAnswerButtonsState(isEnabled: true)
     }
     
-    func showAnswerResult(isCorrect: Bool) {
-        setAnswerButtonsState(isEnabled: false)
-        presenter.didAnswer(isCorrectAnswer: isCorrect)
-
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.presenter.showNextQuestionOrResults()
-        }
-    }
-    
-    private func showNextQuestionOrResults() {
-        if presenter.isLastQuestion() {
-            statisticService.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
-            let text = "Ваш результат: \(presenter.correctAnswers)/\(presenter.questionsAmount) \nКоличество сыгранных квизов: \(statisticService.gamesCount) \nРекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString)) \nСредняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%)"
-            let viewModel = QuizResultsViewModel(
-                title: "Этот раунд окончен!",
-                text: text,
-                buttonText: "Сыграть ещё раз")
-            show(quiz: viewModel)
-        } else {
-            presenter.switchToNextQuestion()
-            presenter.questionFactory?.requestNextQuestion()
-        }
-    }
-    
-    private func setAnswerButtonsState(isEnabled: Bool) {
-        yesButton.isEnabled = isEnabled
-        noButton.isEnabled = isEnabled
-    }
-    
-    private func setUpImage() {
-        imageView.layer.cornerRadius = 20
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
-        imageView.layer.borderColor = UIColor.clear.cgColor
-    }
-    
     func show(quiz result: QuizResultsViewModel) {
-        let alertPresenter = AlertPresenter(presentingController: self)
-        let alertModel = AlertModel(
+        let message = presenter.makeResultsMessage()
+        
+        let alert = UIAlertController(
             title: result.title,
-            message: result.text,
-            buttonText: result.buttonText,
-            completion: { [weak self] in
-                guard let self = self else { return }
-                self.presenter.restartGame()
-                self.setAnswerButtonsState(isEnabled: true)
-            }
-        )
-        alertPresenter.showAlert(model: alertModel)
+            message: message,
+            preferredStyle: .alert)
+            
+        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.presenter.restartGame()
+        }
+        
+        alert.addAction(action)
+        
+        self.present(alert, animated: true, completion: nil)
+        self.setAnswerButtonsState(isEnabled: true)
     }
+    
+    func highlightImageBorder(isCorrectAnswer: Bool) {
+           imageView.layer.masksToBounds = true
+           imageView.layer.borderWidth = 8
+           imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+       }
     
     func showLoadingIndicator() {
         DispatchQueue.main.async { [weak self] in
@@ -100,28 +82,30 @@ final class MovieQuizViewController: UIViewController {
     
     func showNetworkError(message: String) {
         hideLoadingIndicator()
-        let alertPresenter = AlertPresenter(presentingController: self)
-        let model = AlertModel(title: "Ошибка",
-                               message: message,
-                               buttonText: "Попробовать еще раз") { [weak self] in
+        
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: message,
+            preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Попробовать ещё раз",
+                                   style: .default) { [weak self] _ in
             guard let self = self else { return }
+            
             self.presenter.restartGame()
-            self.setAnswerButtonsState(isEnabled: true)
         }
-        alertPresenter.showAlert(model: model)
+        alert.addAction(action)
     }
     
-    //MARK: - Public Methods
-    
-
-    
-    // MARK: - IBActions
-    
-    @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        presenter.yesButtonClicked()
+    func setAnswerButtonsState(isEnabled: Bool) {
+        yesButton.isEnabled = isEnabled
+        noButton.isEnabled = isEnabled
     }
     
-    @IBAction private func noButtonClicked(_ sender: UIButton) {
-        presenter.noButtonClicked()
+    private func setUpImage() {
+        imageView.layer.cornerRadius = 20
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.borderColor = UIColor.clear.cgColor
     }
 }
