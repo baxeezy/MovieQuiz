@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     //MARK: - IBOutlets
     
     @IBOutlet private var imageView: UIImageView!
@@ -19,7 +19,6 @@ final class MovieQuizViewController: UIViewController {
         
         presenter = MovieQuizPresenter(viewController: self)
         setUpImage()
-
     }
     
     // MARK: - Actions
@@ -50,14 +49,14 @@ final class MovieQuizViewController: UIViewController {
             message: message,
             preferredStyle: .alert)
             
+        alert.view.accessibilityIdentifier = "Game results"
+
         let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
             guard let self = self else { return }
             
             self.presenter.restartGame()
         }
-        
         alert.addAction(action)
-        
         self.present(alert, animated: true, completion: nil)
         self.setAnswerButtonsState(isEnabled: true)
     }

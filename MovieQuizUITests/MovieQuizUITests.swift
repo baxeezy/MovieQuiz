@@ -1,4 +1,5 @@
 import XCTest
+@testable import MovieQuiz
 
 final class MovieQuizUITests: XCTestCase {
     
@@ -82,6 +83,7 @@ final class MovieQuizUITests: XCTestCase {
         sleep(2)
         
         let indexLabel = app.staticTexts["Index"]
+        XCTAssertFalse(alert.exists)
         XCTAssertEqual(indexLabel.label, "1/10")
     }
 }

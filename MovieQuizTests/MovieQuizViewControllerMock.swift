@@ -2,28 +2,32 @@ import XCTest
 @testable import MovieQuiz
 
 final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
-    func show(quiz step: MovieQuiz.QuizStepViewModel) {
-        <#code#>
+    func setAnswerButtonsState(isEnabled: Bool) {
+        
     }
     
-    func show(quiz result: MovieQuiz.QuizResultsViewModel) {
-        <#code#>
+    func show(quiz step: QuizStepViewModel) {
+        
+    }
+    
+    func show(quiz result: QuizResultsViewModel) {
+    
     }
     
     func highlightImageBorder(isCorrectAnswer: Bool) {
-        <#code#>
+    
     }
     
     func showLoadingIndicator() {
-        <#code#>
+    
     }
     
     func hideLoadingIndicator() {
-        <#code#>
+    
     }
     
     func showNetworkError(message: String) {
-        <#code#>
+    
     }
 }
 
@@ -31,13 +35,13 @@ final class MovieQuizPresenterTests: XCTestCase {
     func testPresenterConvertModel() throws {
         let viewControllerMock = MovieQuizViewControllerMock()
         let sut = MovieQuizPresenter(viewController: viewControllerMock)
-
+        
         let emptyData = Data()
-        let question = QuizQuestion(image: emptyData, text: "Question text", correctAnswer: true)
+        let question = QuizQuestion(image: emptyData, text: "Question Text", correctAnswer: true)
         let viewModel = sut.convert(model: question)
         
-        XCTAssertNotNil(viewModel.image)
-        XCTAssertEqual(viewModel.question, "Question text")
+         XCTAssertNotNil(viewModel.image)
+        XCTAssertEqual(viewModel.question, "Question Text")
         XCTAssertEqual(viewModel.questionNumber, "1/10")
     }
 }

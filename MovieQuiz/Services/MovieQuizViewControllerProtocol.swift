@@ -1,8 +1,14 @@
-//
-//  MovieQuizViewControllerProtocol.swift
-//  MovieQuiz
-//
-//  Created by Данила on 31.05.2025.
-//
+import UIKit
 
-import Foundation
+protocol MovieQuizViewControllerProtocol: AnyObject {
+    func show(quiz step: QuizStepViewModel)
+    func show(quiz result: QuizResultsViewModel)
+    
+    func highlightImageBorder(isCorrectAnswer: Bool)
+    
+    func showLoadingIndicator()
+    func hideLoadingIndicator()
+    
+    func showNetworkError(message: String)
+    func setAnswerButtonsState(isEnabled: Bool)
+}

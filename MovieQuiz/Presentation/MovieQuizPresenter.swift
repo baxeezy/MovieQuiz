@@ -2,15 +2,18 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
+
     private var currentQuestionIndex: Int = 0
     private let questionsAmount: Int = 10
     private var correctAnswers: Int = 0
     private let statisticService: StatisticServiceProtocol!
     private var currentQuestion: QuizQuestion?
     private var questionFactory: QuestionFactoryProtocol?
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     
-    init(viewController: MovieQuizViewController) {
+    // MARK: - Lifecycle
+
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
         statisticService = StatisticService()
