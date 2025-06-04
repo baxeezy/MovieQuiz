@@ -3,12 +3,12 @@ import UIKit
 final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     //MARK: - IBOutlets
     
-    @IBOutlet private var imageView: UIImageView!
-    @IBOutlet private var textLabel: UILabel!
-    @IBOutlet private var counterLabel: UILabel!
-    @IBOutlet weak var noButton: UIButton!
-    @IBOutlet weak var yesButton: UIButton!
-    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private weak var imageView: UIImageView!
+    @IBOutlet private weak var textLabel: UILabel!
+    @IBOutlet private weak var counterLabel: UILabel!
+    @IBOutlet private weak var noButton: UIButton!
+    @IBOutlet private weak var yesButton: UIButton!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
     private var presenter: MovieQuizPresenter!
     
@@ -101,6 +101,8 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         noButton.isEnabled = isEnabled
     }
     
+    //MARK: - Private functions
+
     private func setUpImage() {
         imageView.layer.cornerRadius = 20
         imageView.layer.masksToBounds = true

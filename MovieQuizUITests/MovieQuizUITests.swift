@@ -22,20 +22,25 @@ final class MovieQuizUITests: XCTestCase {
     }
     
     func testYesButton() {
-        sleep(3)
+        //Given
+        let poster = app.images["Poster"]
+        XCTAssertTrue(poster.waitForExistence(timeout: 5), "Poster did not appear in time")
+        let firstPosterData = poster.screenshot().pngRepresentation
         
-        let firstPoster = app.images["Poster"]    // находим первоначальный постер
-        let firstPosterData = firstPoster.screenshot().pngRepresentation
+        let yesButton = app.buttons["Yes"]
+        XCTAssertTrue(yesButton.waitForExistence(timeout: 2), "Yes button did not appear in time")
         
-        app.buttons["Yes"].tap()    // находим кнопку "Да" и нажимаем на нее
-        sleep(3)
+        //When
+        yesButton.tap()
+        XCTAssertTrue(poster.waitForExistence(timeout: 5), "Poster did not update in time")
+        let secondPosterData = poster.screenshot().pngRepresentation
         
-        let secondPoster = app.images["Poster"]    // еще раз находим постер
-        let secondPosterData = secondPoster.screenshot().pngRepresentation
+        
+        //Then
         let indexLabel = app.staticTexts["Index"]
-        
-        XCTAssertNotEqual(firstPosterData, secondPosterData)    // проверяем, что постеры разные
-        XCTAssertEqual(indexLabel.label, "2/10")
+        XCTAssertTrue(indexLabel.waitForExistence(timeout: 2), "Index Label not found")
+        XCTAssertNotEqual(firstPosterData, secondPosterData, "Poster image did not change")
+        XCTAssertEqual(indexLabel.label, "2/10", "Quiz did not advance to second question")
     }
     
     func testNoButton() {
