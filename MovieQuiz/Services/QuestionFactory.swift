@@ -52,48 +52,33 @@ final class QuestionFactory: QuestionFactoryProtocol {
             }
         }
     }
+    
+    func requestNextQuestionWithYear() {
+        DispatchQueue.global().async { [weak self ] in
+            guard let self = self else { return }
+            let index = (0..<self.movies.count).randomElement() ?? 0
+            guard let movie = self.movies[safe: index] else { return }
+            
+            var imageData = Data()
+            
+            do {
+                imageData = try Data(contentsOf: movie.resizedImageURL)
+            } catch {
+                print("Failed to load image")
+            }
+            let yearOfMovie = Int(movie.year) ?? 0
+            let diapOfYear = min(yearOfMovie + (Bool.random() ? 5 : -5), 2025)
+            
+            let text = "Год выпуска этого фильма старше \(diapOfYear)?"
+            let correctAnswer = yearOfMovie > diapOfYear
+            let question = QuizQuestion(image: imageData,
+                                        text: text,
+                                        correctAnswer: correctAnswer)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.didReceiveNextQuestion(question: question)
+            }
+        }
+    }
 }
-
-//    private let questions: [QuizQuestion] = [
-//        QuizQuestion(
-//            image: "Deadpool",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "Kill Bill",
-//            text:"Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "Old",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: false),
-//        QuizQuestion(
-//            image: "Tesla",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: false),
-//        QuizQuestion(
-//            image: "The Avengers",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "The Dark Knight",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "The Godfather",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "The Green Knight",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: true),
-//        QuizQuestion(
-//            image: "The Ice Age Adventures of Buck Wild",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: false),
-//        QuizQuestion(
-//            image: "Vivarium",
-//            text: "Рейтинг этого фильма\nбольше чем 6?",
-//            correctAnswer: false),
-//    ]
     

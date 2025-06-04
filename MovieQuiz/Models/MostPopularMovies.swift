@@ -9,6 +9,7 @@ struct MostPopularMovie: Codable {
     let title: String
     let imDbRating: String
     let image: URL
+    let year: String
     
     var resizedImageURL: URL {
             let urlString = image.absoluteString

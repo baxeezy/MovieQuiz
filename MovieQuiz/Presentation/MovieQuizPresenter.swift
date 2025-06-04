@@ -28,7 +28,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func didLoadDataFromServer() {
         viewController?.hideLoadingIndicator()
-        questionFactory?.requestNextQuestion()
+        questionFactory?.requestNextQuestionWithYear()
     }
     
     //MARK: - Functions
@@ -60,7 +60,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
-        questionFactory?.requestNextQuestion()
+        questionFactory?.requestNextQuestionWithYear()
     }
     
     func makeResultsMessage() -> String {
@@ -137,7 +137,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                 viewController?.show(quiz: viewModel)
         } else {
             self.switchToNextQuestion()
-            questionFactory?.requestNextQuestion()
+            questionFactory?.requestNextQuestionWithYear()
         }
     }
 }
